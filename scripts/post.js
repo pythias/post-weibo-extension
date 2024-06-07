@@ -1,35 +1,41 @@
-// 找到微博发布框，将微博内容填入
-// 需要等待页面加载完成
-// 由于微博发布框是动态生成的，所以需要等待页面加载完成后再操作
 
-const x = function () {
+const gotWeiboData = function (result) {
+    console.log("Got weibo from extension", result);
+
     const weiboInput = document.querySelector('textarea');
-    if (weiboInput) {
-        chrome.storage.local.get(["weiboFromExtension"], function (data) {
-            const weibo = data.weiboFromExtension;
-            console.log("Got weibo from extension", weibo);
-
-            weiboInput.select();
-            setTimeout(() => {
-                weiboInput.value = "#2024高考作文# by ChatGPT-4o\n" + weibo.text;
-                weiboInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }, 100);
-
-            setTimeout(() => {
-                // 找到发送按钮，点击发送
-                const buttons = document.getElementsByClassName('woo-button-main');
-                Array.from(buttons).forEach(button => {
-                    const buttonContent = button.querySelector('span.woo-button-content');
-                    if (buttonContent && buttonContent.innerText === '发送') {
-                        console.log("Found send button, clicking...");
-                        button.click();
-                    }
-                });
-            }, 200);
-        });
+    if (!weiboInput) {
+        return;
     }
+    
+    const weiboFromExtension = result.weiboFromExtension;
+    weiboInput.select();
+    setTimeout(() => {
+        const postContent = "#2024高考作文# by ChatGPT-4o\n\n" + weiboFromExtension.text;
+        const lines = postContent.split("\n");
+        const formattedLines = lines.map(line => {
+            // 其他格式先不管
+            line = line.replaceAll(/^#+\s/g, "");
+            return line;
+        });
+        weiboInput.value = formattedLines.join("\n");
+        weiboInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }, 100);
+
+    setTimeout(() => {
+        const buttons = document.getElementsByClassName('woo-button-main');
+        Array.from(buttons).forEach(button => {
+            const buttonContent = button.querySelector('span.woo-button-content');
+            if (buttonContent && buttonContent.innerText === '发送') {
+                button.click();
+            }
+        });
+    }, 200);
+};
+
+const execute = function () {
+    chrome.storage.local.get(['weiboFromExtension'], gotWeiboData);
 }
 
-setTimeout(x, 2000);
+setTimeout(execute, 1000);
 
-console.log("post.js loaded v1.0.1");
+console.log("post.js loaded v1.0.2");
