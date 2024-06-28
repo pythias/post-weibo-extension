@@ -1,8 +1,7 @@
-console.log("Post Weibo Extension v1.0.3 loaded.");
+console.log("Post Weibo Extension v1.0.4 loaded.");
 
 const ServiceKimi = 'kimi';
 const ServiceOpenAI = 'openai';
-let service = getPageService();
 
 const PostButtonOpenAI = `
 <span class="" data-state="closed">
@@ -79,7 +78,6 @@ function afterPostButtonClicked(conversationElement = null) {
         });
     });
 
-    // console.debug("Conversation element", conversationElement);
     // html2canvas(conversationContainer, { useCORS: true }).then(canvas => {
     //     const image = canvas.toDataURL("image/png");
     //     console.log("image", image);
@@ -129,16 +127,13 @@ function addWeiboButtons() {
             return;
         }
 
-        console.debug("Weibo Button added", parentDiv);
         const weiboButton = createPostButton();
         parentDiv.insertBefore(weiboButton, parentDiv.firstChild);
         processedConversations.add(parentDiv);
     });
 
-    setTimeout(startObserveConversation, 500);
     return toolElements.length > 0;
 }
-
 
 
 function getPageService() {
@@ -155,52 +150,5 @@ function getPageService() {
     return 'unknown';
 }
 
-
-function startObserveConversation() {
-    let observed = false;
-    switch (service) {
-        case ServiceKimi:
-            observed = observeKimiChat();
-            break;
-        case ServiceOpenAI:
-            observed = observeOpenAIChat();
-            break;
-        default:
-            break;
-    }
-
-    if (!observed) {
-        setTimeout(startObserveConversation, 1000);
-    }
-}
-
-function observeKimiChat() {
-    const conversationContainer = document.querySelector('div[data-testid="virtuoso-item-list"]');
-    if (!conversationContainer) {
-        return false;
-    }
-
-    const observer = new MutationObserver(() => {
-        observer.disconnect();
-        addWeiboButtons();
-    });
-
-    observer.observe(conversationContainer, { childList: true, subtree: true });
-    return true;
-}
-
-function observeOpenAIChat() {
-    const conversationContainer = document.querySelector('div.w-full.text-token-text-primary');
-    if (!conversationContainer) {
-        return false;
-    }
-
-    const observer = new MutationObserver(() => {
-        addWeiboButtons();
-    });
-
-    observer.observe(conversationContainer, { childList: true, subtree: true });
-    return true;
-}
-
-setTimeout(addWeiboButtons, 1000);
+let service = getPageService();
+setInterval(addWeiboButtons, 2000);
