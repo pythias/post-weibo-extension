@@ -8,12 +8,10 @@ const gotWeiboData = function (result) {
     }
     
     const weiboFromExtension = result.weiboFromExtension;
-    weiboInput.select();
     setTimeout(() => {
-        const postContent = "#2024高考作文# by ChatGPT-4o\n\n" + weiboFromExtension.text;
+        const postContent = weiboFromExtension.text;
         const lines = postContent.split("\n");
         const formattedLines = lines.map(line => {
-            // 其他格式先不管
             line = line.replaceAll(/^#+\s/g, "");
             return line;
         });
@@ -38,4 +36,3 @@ const execute = function () {
 
 setTimeout(execute, 1000);
 
-console.log("post.js loaded v1.0.2");

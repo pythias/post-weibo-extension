@@ -27,7 +27,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/c/*"],
+      "matches": ["https://chatgpt.com/c/*", "https://kimi.moonshot.cn/chat/*"],
       "js": ["scripts/content.js"],
       "run_at": "document_idle"
     }
